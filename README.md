@@ -45,30 +45,21 @@ ZynexHub is a full-stack social networking platform where users can connect, sha
    npm install
    ```
  3.Install frontend dependencies:
-
-xhub
-  ```  bash
-Copy code
-cd ../frontend
-npm install
- ```
-xhub
-
-   
+   ```  bash
+   cd ../frontend
+   npm install
+   ```   
 Set up environment variables: Create a .env file in the /backend folder and add:
-
  ```bash
 MONGODB_URI=<your_mongo_database_url>
 JWT_SECRET=<your_jwt_secret_key>
  ```
 Start the backend server:
-
  ```bash
 cd ../backend
 npm start
  ```
 Start the frontend server:
-
  ```bash
 cd ../frontend
 npm start
