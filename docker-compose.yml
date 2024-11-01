@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/zynexhub
+    depends_on:
+      - mongo
+
+  python-sentiment:
+    build: ./python-sentiment
+    ports:
+      - "5001:5001"
+
+  go-chat:
+    build: ./go-chat
+    ports:
+      - "5002:5002"
+
+  rust-auth:
+    build: ./rust-auth
+    ports:
+      - "5003:5003"
+
+  java-activity:
+    build: ./java-activity
+    ports:
+      - "5004:5004"
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
