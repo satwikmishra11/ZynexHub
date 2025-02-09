@@ -1,8 +1,8 @@
-# ZynexHub
+# ZynexHub:-
 
 ZynexHub is a full-stack social networking platform where users can connect, share, and communicate in real time. Designed with secure user authentication, profile management, and live chat, ZynexHub includes essential features for a modern social media application.
 
-## Features
+## Features:-
 
 - **User Authentication**: Secure registration and login using JWT tokens.
 - **User Profiles**: Users can create and personalize profiles with bios and profile pictures.
@@ -11,7 +11,7 @@ ZynexHub is a full-stack social networking platform where users can connect, sha
 - **Feed System**: See a personalized feed with posts from followed users.
 - **Security**: Built with bcrypt password encryption, HTTPS, and secure coding practices.
 
-## Tech Stack
+## Tech Stack:-
 
 - **Frontend**: React.js
 - **Backend**: Node.js with Express
