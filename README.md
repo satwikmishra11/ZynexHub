@@ -26,13 +26,13 @@ ZynexHub is a full-stack social networking platform where users can connect, sha
 
 ## Getting Started:-
 
-### Prerequisites
+### Prerequisites:-
 
 - [Node.js](https://nodejs.org/) and npm
 - [MongoDB](https://www.mongodb.com/) (or PostgreSQL)
 - [Socket.io](https://socket.io/)
 
-### Installation
+### Installation:-
 
  1. Clone the repository:
    ```bash
@@ -64,10 +64,10 @@ Start the frontend server:
 cd ../frontend
 npm start
  ```
-Usage
+Usage:-
 Once both servers are running, navigate to http://localhost:3000 to access the ZynexHub frontend.
 
-Contributing
+Contributing:-
 Contributions are welcome! Feel free to submit issues and pull requests to help improve ZynexHub.
 
 License
