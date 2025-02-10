@@ -24,7 +24,7 @@ ZynexHub is a full-stack social networking platform where users can connect, sha
 - **/backend**: API for handling user authentication, post management, and chat services.
 - **/frontend**: React-based components for login, profile, feed, and chat interfaces.
 
-## Getting Started
+## Getting Started:-
 
 ### Prerequisites
 
