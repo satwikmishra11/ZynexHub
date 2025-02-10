@@ -19,7 +19,7 @@ ZynexHub is a full-stack social networking platform where users can connect, sha
 - **Real-Time Communication**: Socket.io for live messaging
 - **Authentication**: JSON Web Tokens (JWT)
 
-## Project Structure
+## Project Structure:-
 
 - **/backend**: API for handling user authentication, post management, and chat services.
 - **/frontend**: React-based components for login, profile, feed, and chat interfaces.
