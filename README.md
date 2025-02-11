@@ -1,8 +1,8 @@
-# ZynexHub:-
+# ZynexHub
 
 ZynexHub is a full-stack social networking platform where users can connect, share, and communicate in real time. Designed with secure user authentication, profile management, and live chat, ZynexHub includes essential features for a modern social media application.
 
-## Features:-
+## Features
 
 - **User Authentication**: Secure registration and login using JWT tokens.
 - **User Profiles**: Users can create and personalize profiles with bios and profile pictures.
@@ -11,7 +11,7 @@ ZynexHub is a full-stack social networking platform where users can connect, sha
 - **Feed System**: See a personalized feed with posts from followed users.
 - **Security**: Built with bcrypt password encryption, HTTPS, and secure coding practices.
 
-## Tech Stack:-
+## Tech Stack
 
 - **Frontend**: React.js
 - **Backend**: Node.js with Express
@@ -19,20 +19,20 @@ ZynexHub is a full-stack social networking platform where users can connect, sha
 - **Real-Time Communication**: Socket.io for live messaging
 - **Authentication**: JSON Web Tokens (JWT)
 
-## Project Structure:-
+## Project Structure
 
 - **/backend**: API for handling user authentication, post management, and chat services.
 - **/frontend**: React-based components for login, profile, feed, and chat interfaces.
 
-## Getting Started:-
+## Getting Started
 
-### Prerequisites:-
+### Prerequisites
 
 - [Node.js](https://nodejs.org/) and npm
 - [MongoDB](https://www.mongodb.com/) (or PostgreSQL)
 - [Socket.io](https://socket.io/)
 
-### Installation:-
+### Installation
 
  1. Clone the repository:
    ```bash
