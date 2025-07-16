@@ -1,45 +1,57 @@
-import { create } from 'zustand'
-import { supabase } from '../lib/supabase'
-import type { User } from '@supabase/supabase-js'
+import { create } from 'zustand';
+import { supabase } from '../lib/supabase';
+import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
 
 interface Profile {
-  id: string
-  username: string
-  full_name: string | null
-  bio: string | null
-  avatar_url: string | null
-  created_at: string
-  updated_at: string
+  id: string;
+  username: string;
+  full_name: string | null;
+  bio: string | null;
+  avatar_url: string | null;
 }
 
 interface AuthState {
-  user: User | null
-  profile: Profile | null
-  loading: boolean
-  signIn: (email: string, password: string) => Promise<void>
-  signUp: (email: string, password: string, username: string, fullName: string) => Promise<void>
-  signOut: () => Promise<void>
-  updateProfile: (updates: Partial<Profile>) => Promise<void>
-  fetchProfile: () => Promise<void>
-  resendConfirmationEmail: (email: string) => Promise<void>
+  session: Session | null;
+  user: User | null;
+  profile: Profile | null;
+  loading: boolean;
+  setSession: (session: Session | null) => void;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, username: string, fullName: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  fetchProfile: (user: User) => Promise<void>;
+  updateProfile: (updates: Partial<Profile>) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
+  session: null,
   user: null,
   profile: null,
   loading: true,
 
-  signIn: async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) throw error
+  setSession: (session) => {
+    set({ session, user: session?.user ?? null, loading: false });
   },
 
-  signUp: async (email: string, password: string, username: string, fullName: string) => {
-    const { data, error } = await supabase.auth.signUp({ email, password })
-    if (error) throw error
-    
+  signIn: async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+  },
+
+  signUp: async (email, password, username, fullName) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username,
+          full_name: fullName,
+        },
+      },
+    });
+    if (error) throw error;
     if (data.user) {
-      const { error: profileError } = await supabase
+        const { error: profileError } = await supabase
         .from('profiles')
         .insert({
           id: data.user.id,
@@ -51,55 +63,45 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signOut: async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
-    set({ user: null, profile: null })
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    set({ session: null, user: null, profile: null });
   },
 
-  updateProfile: async (updates: Partial<Profile>) => {
-    const { user } = get()
-    if (!user) throw new Error('No user logged in')
-    
+  fetchProfile: async (user) => {
+    if (!user) return;
+    try {
+      const { data, error, status } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      if (error && status !== 406) throw error;
+      if (data) set({ profile: data });
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  },
+
+  updateProfile: async (updates) => {
+    const { user } = get();
+    if (!user) throw new Error('No user logged in');
+
     const { error } = await supabase
       .from('profiles')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', user.id)
-    
-    if (error) throw error
-    await get().fetchProfile()
-  },
+      .update(updates)
+      .eq('id', user.id);
 
-  fetchProfile: async () => {
-    const { user } = get()
-    if (!user) return
-    
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single()
-    
-    if (error) throw error
-    set({ profile: data })
+    if (error) throw error;
+    set(state => ({ profile: { ...state.profile!, ...updates } }));
   },
+}));
 
-  resendConfirmationEmail: async (email: string) => {
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email: email
-    })
-    if (error) throw error
-  },
-}))
-
-// Initialize auth state
-supabase.auth.onAuthStateChange(async (event, session) => {
-  const { fetchProfile } = useAuthStore.getState()
-  
+// Listen for auth state changes
+supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
+  const { setSession, fetchProfile } = useAuthStore.getState();
+  setSession(session);
   if (session?.user) {
-    useAuthStore.setState({ user: session.user, loading: false })
-    await fetchProfile()
-  } else {
-    useAuthStore.setState({ user: null, profile: null, loading: false })
+    fetchProfile(session.user);
   }
-})
+});
