@@ -21,11 +21,11 @@
   "routes": [
     {
       "src": "/api/sentiment",
-      "dest": "/api/sentiment/service.py"
+      "dest": "api/sentiment/service.py"
     },
     {
       "src": "/api/auth",
-      "dest": "/api/auth/main.rs"
+      "dest": "api/auth/main.rs"
     },
     {
       "src": "/(.*)",
