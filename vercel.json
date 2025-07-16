@@ -2,14 +2,6 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/sentiment/service.py",
-      "use": "@vercel/python"
-    },
-    {
-      "src": "api/auth/Cargo.toml",
-      "use": "vercel-rust"
-    },
-    {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -19,14 +11,6 @@
     }
   ],
   "routes": [
-    {
-      "src": "/api/sentiment",
-      "dest": "api/sentiment/service.py"
-    },
-    {
-      "src": "/api/auth",
-      "dest": "api/auth/main.rs"
-    },
     {
       "src": "/(.*)",
       "dest": "/index.html"
