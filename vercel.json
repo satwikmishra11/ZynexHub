@@ -2,36 +2,32 @@
   "version": 2,
   "builds": [
     {
-      "src": "python-sentiment/service.py",
+      "src": "api/sentiment/service.py",
       "use": "@vercel/python"
     },
     {
-      "src": "rust-auth/Cargo.toml",
-      "use": "vercel-rust",
-      "config": {
-        "module": "rust-auth"
-      }
+      "src": "api/auth/main.rs",
+      "use": "vercel-rust"
     },
     {
       "src": "package.json",
-      "use": "@vercel/node",
+      "use": "@vercel/vite",
       "config": {
-        "maxLambdaSize": "15mb",
-        "buildCommand": "npm run build"
+        "maxLambdaSize": "15mb"
       }
     }
   ],
   "routes": [
     {
       "src": "/api/sentiment",
-      "dest": "python-sentiment/service.py"
+      "dest": "/api/sentiment/service.py"
     },
     {
       "src": "/api/auth",
-      "dest": "rust-auth"
+      "dest": "/api/auth/main.rs"
     },
     {
-      "src": "/(.*)",
+      "src": "/((?!api/|assets/).*)",
       "dest": "/index.html"
     }
   ]
