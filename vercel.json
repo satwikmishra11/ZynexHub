@@ -11,9 +11,10 @@
     },
     {
       "src": "package.json",
-      "use": "@vercel/vite",
+      "use": "@vercel/static-build",
       "config": {
-        "maxLambdaSize": "15mb"
+        "buildCommand": "npm run build",
+        "outputDirectory": "dist"
       }
     }
   ],
