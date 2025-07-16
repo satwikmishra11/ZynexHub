@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
+import { supabase } from './lib/supabase';
 import AuthForm from './components/AuthForm';
 import Layout from './components/Layout';
 import Feed from './pages/Feed';
@@ -10,21 +11,40 @@ import Settings from './pages/Settings';
 import { Toaster } from 'sonner';
 
 const App: React.FC = () => {
-  const { session, loading, setSession } = useAuthStore();
+  const { session, loading, setSession, setLoading, fetchProfile } = useAuthStore();
 
   useEffect(() => {
-    // Set the initial session state
-    setSession(supabase.auth.getSession());
+    const initializeApp = async () => {
+      // 1. Fetch the current session
+      const { data: { session: initialSession } } = await supabase.auth.getSession();
+      
+      // 2. If a session exists, fetch the user profile
+      if (initialSession) {
+        await fetchProfile(initialSession.user);
+      }
+      
+      // 3. Update the session state in the store
+      setSession(initialSession);
+      
+      // 4. Stop loading
+      setLoading(false);
 
-    // Listen for auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+      // 5. Set up a listener for future auth changes
+      const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        setSession(session);
+        if (session) {
+          await fetchProfile(session.user);
+        }
+        setLoading(false);
+      });
 
-    return () => {
-      authListener.subscription.unsubscribe();
+      return () => {
+        authListener.subscription.unsubscribe();
+      };
     };
-  }, [setSession]);
+
+    initializeApp();
+  }, [setSession, setLoading, fetchProfile]);
 
   if (loading) {
     return (
