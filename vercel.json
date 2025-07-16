@@ -6,12 +6,12 @@
       "use": "@vercel/python"
     },
     {
-      "src": "api/auth/main.rs",
-      "use": "vercel-rust",
-      "config": {
-        "release": true,
-        "clean": true
-      }
+      "src": "api/auth/Cargo.toml",
+      "use": "vercel-rust"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/vite"
     }
   ],
   "routes": [
@@ -22,6 +22,10 @@
     {
       "src": "/api/auth",
       "dest": "/api/auth/main.rs"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/"
     }
   ]
 }
