@@ -7,7 +7,11 @@
     },
     {
       "src": "api/auth/main.rs",
-      "use": "vercel-rust"
+      "use": "vercel-rust",
+      "config": {
+        "release": true,
+        "clean": true
+      }
     }
   ],
   "routes": [
