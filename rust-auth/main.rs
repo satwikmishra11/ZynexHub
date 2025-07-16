@@ -1,4 +1,4 @@
-use actix_web::{web, App, HttpServer, HttpResponse, Responder};
+use actix_web::{web, App, HttpServer, Responder, HttpResponse};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -8,7 +8,7 @@ struct LoginRequest {
 }
 
 async fn login(data: web::Json<LoginRequest>) -> impl Responder {
-    // Perform validation here (e.g., database query)
+    // In a real app, you would validate against a database
     if data.username == "user" && data.password == "password" {
         HttpResponse::Ok().json({"status": "success"})
     } else {
@@ -16,13 +16,14 @@ async fn login(data: web::Json<LoginRequest>) -> impl Responder {
     }
 }
 
+// This is the entry point for Vercel
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
-            .route("/login", web::post().to(login))
+            .route("/api/auth", web::post().to(login))
     })
-    .bind("127.0.0.1:5003")?
+    .bind("0.0.0.0:8080")?
     .run()
     .await
 }
