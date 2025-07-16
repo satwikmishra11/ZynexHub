@@ -1,4 +1,3 @@
-// chat_service.go
 package main
 
 import (
@@ -11,27 +10,35 @@ var upgrader = websocket.Upgrader{
     CheckOrigin: func(r *http.Request) bool { return true },
 }
 
-func handleChat(w http.ResponseWriter, r *http.Request) {
-    conn, err := upgrader.Upgrade(w, r, nil)
+func handleConnections(w http.ResponseWriter, r *http.Request) {
+    ws, err := upgrader.Upgrade(w, r, nil)
     if err != nil {
-        log.Println(err)
-        return
+        log.Fatal(err)
     }
-    defer conn.Close()
+    defer ws.Close()
 
     for {
-        _, message, err := conn.ReadMessage()
+        var msg Message
+        err := ws.ReadJSON(&msg)
         if err != nil {
-            log.Println("Read error:", err)
+            log.Printf("error: %v", err)
             break
         }
-        log.Printf("Received: %s", message)
-        // Echo message back to client
-        conn.WriteMessage(websocket.TextMessage, message)
+        log.Printf("Received: %v", msg)
     }
 }
 
 func main() {
-    http.HandleFunc("/ws", handleChat)
-    log.Fatal(http.ListenAndServe(":5002", nil))
+    http.HandleFunc("/ws", handleConnections)
+    log.Println("http server started on :8000")
+    err := http.ListenAndServe(":8000", nil)
+    if err != nil {
+        log.Fatal("ListenAndServe: ", err)
+    }
+}
+
+type Message struct {
+    Email    string `json:"email"`
+    Username string `json:"username"`
+    Message  string `json:"message"`
 }
