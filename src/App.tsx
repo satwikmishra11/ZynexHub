@@ -14,37 +14,22 @@ const App: React.FC = () => {
   const { session, loading, setSession, setLoading, fetchProfile } = useAuthStore();
 
   useEffect(() => {
-    const initializeApp = async () => {
-      // 1. Fetch the current session
-      const { data: { session: initialSession } } = await supabase.auth.getSession();
-      
-      // 2. If a session exists, fetch the user profile
-      if (initialSession) {
-        await fetchProfile(initialSession.user);
-      }
-      
-      // 3. Update the session state in the store
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
       setSession(initialSession);
-      
-      // 4. Stop loading
+      if (initialSession) {
+        fetchProfile(initialSession.user);
+      }
       setLoading(false);
+    });
 
-      // 5. Set up a listener for future auth changes
-      const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-        setSession(session);
-        if (session) {
-          await fetchProfile(session.user);
-        }
-        setLoading(false);
-      });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
 
-      return () => {
-        authListener.subscription.unsubscribe();
-      };
+    return () => {
+      subscription?.unsubscribe();
     };
-
-    initializeApp();
-  }, [setSession, setLoading, fetchProfile]);
+  }, []); 
 
   if (loading) {
     return (
