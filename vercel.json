@@ -8,6 +8,14 @@
     {
       "src": "api/auth/Cargo.toml",
       "use": "vercel-rust"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "npm run build",
+        "outputDirectory": "dist"
+      }
     }
   ],
   "routes": [
@@ -18,6 +26,10 @@
     {
       "src": "/api/auth",
       "dest": "api/auth/main.rs"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
