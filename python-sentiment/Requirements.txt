@@ -1,2 +1,0 @@
-Flask==2.2.2
-textblob==0.17.1
