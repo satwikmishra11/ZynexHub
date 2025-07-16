@@ -13,6 +13,10 @@ const App: React.FC = () => {
   const { session, loading, setSession } = useAuthStore();
 
   useEffect(() => {
+    // Set the initial session state
+    setSession(supabase.auth.getSession());
+
+    // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
@@ -24,65 +28,24 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
     <Router>
-      <Toaster />
+      <Toaster richColors />
       <Routes>
-        <Route
-          path="/"
-          element={
-            session ? (
-              <Layout>
-                <Feed />
-              </Layout>
-            ) : (
-              <Navigate to="/auth" />
-            )
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            session ? (
-              <Layout>
-                <Profile />
-              </Layout>
-            ) : (
-              <Navigate to="/auth" />
-            )
-          }
-        />
-        <Route
-          path="/messages"
-          element={
-            session ? (
-              <Layout>
-                <Messages />
-              </Layout>
-            ) : (
-              <Navigate to="/auth" />
-            )
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            session ? (
-              <Layout>
-                <Settings />
-              </Layout>
-            ) : (
-              <Navigate to="/auth" />
-            )
-          }
-        />
         <Route path="/auth" element={!session ? <AuthForm /> : <Navigate to="/" />} />
+        
+        <Route path="/" element={session ? <Layout><Feed /></Layout> : <Navigate to="/auth" />} />
+        <Route path="/profile" element={session ? <Layout><Profile /></Layout> : <Navigate to="/auth" />} />
+        <Route path="/messages" element={session ? <Layout><Messages /></Layout> : <Navigate to="/auth" />} />
+        <Route path="/settings" element={session ? <Layout><Settings /></Layout> : <Navigate to="/auth" />} />
+        
+        <Route path="*" element={<Navigate to={session ? "/" : "/auth"} />} />
       </Routes>
     </Router>
   );
