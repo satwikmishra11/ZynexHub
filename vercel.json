@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "python-sentiment/service.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "rust-auth/Cargo.toml",
+      "use": "vercel-rust",
+      "config": {
+        "module": "rust-auth"
+      }
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/node",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "buildCommand": "npm run build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/sentiment",
+      "dest": "python-sentiment/service.py"
+    },
+    {
+      "src": "/api/auth",
+      "dest": "rust-auth"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
