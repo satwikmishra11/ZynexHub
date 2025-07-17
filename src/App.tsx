@@ -16,26 +16,20 @@ const App: React.FC = () => {
   useEffect(() => {
     // This single listener handles the initial state check AND any subsequent
     // auth changes (login, logout, token refresh).
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      // 1. Update the session in the store.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
-      
-      // 2. If the user is logged in, fetch their profile data.
       if (session) {
-        fetchProfile(session.user);
+        await fetchProfile(session.user);
       }
-      
-      // 3. Stop the main loading spinner once the initial auth state is known.
+      // Stop the main loading spinner once the initial auth state is known.
       setLoading(false);
     });
 
-    // 4. Clean up the listener when the component unmounts.
+    // Clean up the listener when the component unmounts.
     return () => {
       subscription?.unsubscribe();
     };
     
-    // The dependency array now correctly includes all external functions used
-    // inside the effect, fixing the hidden dependency error.
   }, [setSession, setLoading, fetchProfile]);
 
   if (loading) {
