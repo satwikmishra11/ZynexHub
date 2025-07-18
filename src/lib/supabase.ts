@@ -9,7 +9,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Database types
+// Database types based on actual schema
 export interface Database {
   public: {
     Tables: {
@@ -17,36 +17,24 @@ export interface Database {
         Row: {
           id: string;
           username: string;
-          full_name: string;
+          full_name: string | null;
           bio: string | null;
           avatar_url: string | null;
-          is_verified: boolean;
-          followers_count: number;
-          following_count: number;
-          posts_count: number;
-          created_at: string;
-          updated_at: string;
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
           id: string;
           username: string;
-          full_name: string;
+          full_name?: string | null;
           bio?: string | null;
           avatar_url?: string | null;
-          is_verified?: boolean;
-          followers_count?: number;
-          following_count?: number;
-          posts_count?: number;
         };
         Update: {
           username?: string;
-          full_name?: string;
+          full_name?: string | null;
           bio?: string | null;
           avatar_url?: string | null;
-          is_verified?: boolean;
-          followers_count?: number;
-          following_count?: number;
-          posts_count?: number;
           updated_at?: string;
         };
       };
@@ -55,52 +43,21 @@ export interface Database {
           id: string;
           user_id: string;
           content: string;
-          images: string[] | null;
-          likes_count: number;
-          comments_count: number;
-          shares_count: number;
-          created_at: string;
-          updated_at: string;
+          image_url: string | null;
+          likes_count: number | null;
+          comments_count: number | null;
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
           user_id: string;
           content: string;
-          images?: string[] | null;
-          likes_count?: number;
-          comments_count?: number;
-          shares_count?: number;
+          image_url?: string | null;
         };
         Update: {
           content?: string;
-          images?: string[] | null;
-          likes_count?: number;
-          comments_count?: number;
-          shares_count?: number;
+          image_url?: string | null;
           updated_at?: string;
-        };
-      };
-      stories: {
-        Row: {
-          id: string;
-          user_id: string;
-          media_url: string;
-          media_type: 'image' | 'video';
-          content: string | null;
-          views_count: number;
-          expires_at: string;
-          created_at: string;
-        };
-        Insert: {
-          user_id: string;
-          media_url: string;
-          media_type: 'image' | 'video';
-          content?: string | null;
-          views_count?: number;
-          expires_at: string;
-        };
-        Update: {
-          content?: string | null;
-          views_count?: number;
         };
       };
       comments: {
@@ -109,19 +66,16 @@ export interface Database {
           post_id: string;
           user_id: string;
           content: string;
-          likes_count: number;
-          created_at: string;
-          updated_at: string;
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
           post_id: string;
           user_id: string;
           content: string;
-          likes_count?: number;
         };
         Update: {
           content?: string;
-          likes_count?: number;
           updated_at?: string;
         };
       };
@@ -129,17 +83,59 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          post_id: string | null;
-          comment_id: string | null;
-          created_at: string;
+          post_id: string;
+          created_at: string | null;
         };
         Insert: {
           user_id: string;
-          post_id?: string | null;
-          comment_id?: string | null;
+          post_id: string;
         };
         Update: {};
+      };
+      messages: {
+        Row: {
+          id: string;
+          sender_id: string;
+          receiver_id: string;
+          content: string;
+          created_at: string | null;
+        };
+        Insert: {
+          sender_id: string;
+          receiver_id: string;
+          content: string;
+        };
+        Update: {};
+      };
+      stories: {
+        Row: {
+          id: string;
+          user_id: string;
+          media_url: string;
+          media_type: string | null;
+          content: string | null;
+          views_count: number | null;
+          expires_at: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          user_id: string;
+          media_url: string;
+          media_type?: string | null;
+          content?: string | null;
+        };
+        Update: {
+          content?: string | null;
+          views_count?: number;
+        };
       };
     };
   };
 }
+
+export type Profile = Database['public']['Tables']['profiles']['Row'];
+export type Post = Database['public']['Tables']['posts']['Row'];
+export type Comment = Database['public']['Tables']['comments']['Row'];
+export type Like = Database['public']['Tables']['likes']['Row'];
+export type Message = Database['public']['Tables']['messages']['Row'];
+export type Story = Database['public']['Tables']['stories']['Row'];

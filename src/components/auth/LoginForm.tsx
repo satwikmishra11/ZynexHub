@@ -24,6 +24,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
 
     try {
       await login(email, password);
+      // Login successful - the auth state change will handle redirection
     } catch (error: any) {
       setError(error.message);
       if (error.message.includes('Email not confirmed')) {

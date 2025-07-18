@@ -9,28 +9,23 @@ export const AuthCallback: React.FC = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        if (!supabase) {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Auth callback error:', error);
           navigate('/');
           return;
         }
 
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Auth callback error:', error);
-          navigate('/?error=auth_callback_failed');
-          return;
-        }
-
-        if (data.session) {
+        if (session) {
           // User is now authenticated
-          navigate('/?confirmed=true');
+          navigate('/');
         } else {
           navigate('/');
         }
       } catch (error) {
         console.error('Auth callback error:', error);
-        navigate('/?error=auth_callback_failed');
+        navigate('/');
       }
     };
 

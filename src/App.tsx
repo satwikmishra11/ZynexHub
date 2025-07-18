@@ -24,6 +24,9 @@ const AppContent: React.FC = () => {
     );
   }
 
+  // Debug logging
+  console.log('Auth State:', authState);
+
   return (
     <Routes>
       <Route path="/auth/callback" element={<AuthCallback />} />
