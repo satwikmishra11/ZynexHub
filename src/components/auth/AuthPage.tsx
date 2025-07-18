@@ -13,9 +13,9 @@ export const AuthPage: React.FC = () => {
       </div>
       
       <div className="relative w-full max-w-md">
-        <div className="glass-effect p-8 rounded-3xl shadow-2xl animate-fade-in">
+        <div className="bg-white/95 backdrop-blur-sm border border-gray-200 p-8 rounded-3xl shadow-2xl animate-fade-in">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 gradient-bg rounded-2xl mb-4">
               <span className="text-2xl font-bold text-white">Z</span>
             </div>
           </div>

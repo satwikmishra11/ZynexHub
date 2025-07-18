@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { PostCard } from './PostCard';
 import { CreatePostCard } from './CreatePostCard';
+import { StoriesBar } from '../stories/StoriesBar';
 import { Post } from '../../types';
-import { mockPosts } from '../../data/mockData';
+import { mockPosts, mockStories } from '../../data/mockData';
 import { LoadingSpinner } from '../LoadingSpinner';
 
 export const FeedPage: React.FC = () => {
@@ -52,8 +53,13 @@ export const FeedPage: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
+      {/* Stories Bar */}
+      <StoriesBar stories={mockStories} />
+      
+      {/* Create Post */}
       <CreatePostCard onCreatePost={handleCreatePost} />
       
+      {/* Posts Feed */}
       <div className="space-y-0">
         {posts.map((post) => (
           <PostCard

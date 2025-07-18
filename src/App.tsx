@@ -1,7 +1,8 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './components/AuthProvider';
 import { AuthPage } from './components/auth/AuthPage';
+import { AuthCallback } from './components/auth/AuthCallback';
 import { MainApp } from './components/MainApp';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { useAuth } from './hooks/useAuth';
@@ -17,12 +18,18 @@ const AppContent: React.FC = () => {
             <span className="text-2xl font-bold text-white">Z</span>
           </div>
           <LoadingSpinner size="lg" />
+          <p className="text-gray-600 mt-4">Loading ZynexHub...</p>
         </div>
       </div>
     );
   }
 
-  return authState.isAuthenticated ? <MainApp /> : <AuthPage />;
+  return (
+    <Routes>
+      <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/*" element={authState.isAuthenticated ? <MainApp /> : <AuthPage />} />
+    </Routes>
+  );
 };
 
 function App() {

@@ -1,4 +1,4 @@
-import { User, Post } from '../types';
+import { User, Post, Story } from '../types';
 
 export const mockUsers: User[] = [
   {
@@ -39,6 +39,70 @@ export const mockUsers: User[] = [
     followingCount: 1234,
     postsCount: 234,
     createdAt: '2024-01-05T09:20:00Z',
+  },
+  {
+    id: '5',
+    username: 'alex_photo',
+    email: 'alex@example.com',
+    fullName: 'Alex Thompson',
+    bio: 'Professional photographer | Capturing moments that matter 📷',
+    avatar: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=400',
+    isVerified: true,
+    followersCount: 3456,
+    followingCount: 890,
+    postsCount: 178,
+    createdAt: '2024-01-10T12:00:00Z',
+  },
+];
+
+export const mockStories: Story[] = [
+  {
+    id: '1',
+    userId: '2',
+    user: mockUsers[0],
+    mediaUrl: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
+    mediaType: 'image',
+    content: 'Working late tonight! 💻',
+    viewsCount: 45,
+    isViewed: false,
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: '2024-12-10T20:30:00Z',
+  },
+  {
+    id: '2',
+    userId: '3',
+    user: mockUsers[1],
+    mediaUrl: 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=400',
+    mediaType: 'image',
+    content: 'New design concepts! 🎨',
+    viewsCount: 67,
+    isViewed: true,
+    expiresAt: new Date(Date.now() + 20 * 60 * 60 * 1000).toISOString(),
+    createdAt: '2024-12-10T18:15:00Z',
+  },
+  {
+    id: '3',
+    userId: '4',
+    user: mockUsers[2],
+    mediaUrl: 'https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg?auto=compress&cs=tinysrgb&w=400',
+    mediaType: 'image',
+    content: 'Beach vibes! 🌊',
+    viewsCount: 123,
+    isViewed: false,
+    expiresAt: new Date(Date.now() + 18 * 60 * 60 * 1000).toISOString(),
+    createdAt: '2024-12-10T16:45:00Z',
+  },
+  {
+    id: '4',
+    userId: '5',
+    user: mockUsers[3],
+    mediaUrl: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=400',
+    mediaType: 'image',
+    content: 'Golden hour magic ✨',
+    viewsCount: 89,
+    isViewed: false,
+    expiresAt: new Date(Date.now() + 22 * 60 * 60 * 1000).toISOString(),
+    createdAt: '2024-12-10T19:20:00Z',
   },
 ];
 

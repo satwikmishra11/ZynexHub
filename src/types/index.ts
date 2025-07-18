@@ -28,6 +28,19 @@ export interface Post {
   updatedAt: string;
 }
 
+export interface Story {
+  id: string;
+  userId: string;
+  user: User;
+  mediaUrl: string;
+  mediaType: 'image' | 'video';
+  content?: string;
+  viewsCount: number;
+  isViewed: boolean;
+  expiresAt: string;
+  createdAt: string;
+}
+
 export interface Comment {
   id: string;
   postId: string;
@@ -36,6 +49,7 @@ export interface Comment {
   content: string;
   likesCount: number;
   isLiked: boolean;
+  replies?: Comment[];
   createdAt: string;
 }
 
