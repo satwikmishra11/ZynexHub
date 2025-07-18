@@ -1,45 +1,17 @@
-import { create } from 'zustand'
-import { supabase } from '../lib/supabase'
-
-interface Post {
-  id: string
-  user_id: string
-  content: string
-  image_url: string | null
-  likes_count: number
-  comments_count: number
-  created_at: string
-  updated_at: string
-  profiles: {
-    username: string
-    full_name: string | null
-    avatar_url: string | null
-  }
-  is_liked?: boolean
-}
-
-interface Comment {
-  id: string
-  user_id: string
-  post_id: string
-  content: string
-  created_at: string
-  profiles: {
-    username: string
-    full_name: string | null
-    avatar_url: string | null
-  }
-}
+import { create } from 'zustand';
+import { supabase } from '../lib/supabase';
+import { Post, Comment } from '../types';
 
 interface PostState {
-  posts: Post[]
-  comments: { [postId: string]: Comment[] }
-  loading: boolean
-  fetchFeed: () => Promise<void>
-  createPost: (content: string, imageUrl?: string) => Promise<void>
-  likePost: (postId: string) => Promise<void>
-  fetchComments: (postId: string) => Promise<void>
-  addComment: (postId: string, content: string) => Promise<void>
+  posts: Post[];
+  comments: { [postId: string]: Comment[] };
+  loading: boolean;
+  fetchFeed: () => Promise<void>;
+  getPost: (postId: string) => Post | undefined;
+  createPost: (content: string, imageUrl?: string) => Promise<void>;
+  likePost: (postId: string) => Promise<void>;
+  fetchComments: (postId: string) => Promise<void>;
+  addComment: (postId: string, content: string) => Promise<void>;
 }
 
 export const usePostStore = create<PostState>((set, get) => ({
@@ -48,141 +20,144 @@ export const usePostStore = create<PostState>((set, get) => ({
   loading: false,
 
   fetchFeed: async () => {
-    set({ loading: true })
+    set({ loading: true });
     try {
-      const { data, error } = await supabase
+      const { data: posts, error } = await supabase
         .from('posts')
-        .select(`
-          *,
-          profiles:user_id (
-            username,
-            full_name,
-            avatar_url
-          )
-        `)
-        .order('created_at', { ascending: false })
-      
-      if (error) throw error
-      
-      // Check which posts are liked by current user
-      const { data: { user } } = await supabase.auth.getUser()
+        .select('*, profiles(*)')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: likes } = await supabase
           .from('likes')
           .select('post_id')
-          .eq('user_id', user.id)
+          .eq('user_id', user.id);
         
-        const likedPostIds = new Set(likes?.map(like => like.post_id) || [])
+        const likedPostIds = new Set(likes?.map(like => like.post_id));
         
-        const postsWithLikes = data?.map(post => ({
+        const postsWithLikes = posts?.map(post => ({
           ...post,
-          is_liked: likedPostIds.has(post.id)
-        })) || []
+          is_liked: likedPostIds.has(post.id),
+        })) || [];
         
-        set({ posts: postsWithLikes })
+        set({ posts: postsWithLikes as any[] });
       } else {
-        set({ posts: data || [] })
+        set({ posts: posts as any[] });
       }
     } catch (error) {
-      console.error('Error fetching feed:', error)
+      console.error('Error fetching feed:', error);
     } finally {
-      set({ loading: false })
+      set({ loading: false });
     }
+  },
+
+  getPost: (postId: string) => {
+    return get().posts.find(post => post.id === postId);
   },
 
   createPost: async (content: string, imageUrl?: string) => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('No user logged in')
-    
-    const { error } = await supabase
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('No user logged in');
+
+    const { data, error } = await supabase
       .from('posts')
-      .insert({
-        user_id: user.id,
-        content,
-        image_url: imageUrl || null,
-      })
-    
-    if (error) throw error
-    await get().fetchFeed()
+      .insert({ user_id: user.id, content, image_url: imageUrl })
+      .select('*, profiles(*)')
+      .single();
+
+    if (error) throw error;
+    set(state => ({ posts: [data as any, ...state.posts] }));
   },
 
   likePost: async (postId: string) => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('No user logged in')
-    
-    // Check if already liked
-    const { data: existingLike } = await supabase
-      .from('likes')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('post_id', postId)
-      .single()
-    
-    if (existingLike) {
-      // Unlike
-      await supabase
-        .from('likes')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('post_id', postId)
-      
-      // Decrement likes count
-      await supabase.rpc('decrement_likes', { post_id: postId })
-    } else {
-      // Like
-      await supabase
-        .from('likes')
-        .insert({ user_id: user.id, post_id: postId })
-      
-      // Increment likes count
-      await supabase.rpc('increment_likes', { post_id: postId })
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('No user logged in');
+
+    const post = get().posts.find(p => p.id === postId);
+    if (!post) return;
+
+    const isLiked = post.is_liked;
+
+    // Optimistically update UI
+    set(state => ({
+      posts: state.posts.map(p =>
+        p.id === postId
+          ? {
+              ...p,
+              is_liked: !isLiked,
+              likes_count: isLiked ? p.likes_count - 1 : p.likes_count + 1,
+            }
+          : p
+      ),
+    }));
+
+    try {
+      if (isLiked) {
+        // Unlike
+        const { error } = await supabase
+          .from('likes')
+          .delete()
+          .match({ user_id: user.id, post_id: postId });
+        if (error) throw error;
+      } else {
+        // Like
+        const { error } = await supabase
+          .from('likes')
+          .insert({ user_id: user.id, post_id: postId });
+        if (error) throw error;
+      }
+    } catch (error) {
+      console.error('Error liking post:', error);
+      // Revert optimistic update on error
+      set(state => ({
+        posts: state.posts.map(p =>
+          p.id === postId
+            ? {
+                ...p,
+                is_liked: isLiked,
+                likes_count: post.likes_count,
+              }
+            : p
+        ),
+      }));
     }
-    
-    await get().fetchFeed()
   },
 
   fetchComments: async (postId: string) => {
     const { data, error } = await supabase
       .from('comments')
-      .select(`
-        *,
-        profiles:user_id (
-          username,
-          full_name,
-          avatar_url
-        )
-      `)
+      .select('*, profiles(*)')
       .eq('post_id', postId)
-      .order('created_at', { ascending: true })
-    
-    if (error) throw error
-    
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
     set(state => ({
-      comments: {
-        ...state.comments,
-        [postId]: data || []
-      }
-    }))
+      comments: { ...state.comments, [postId]: data as any[] },
+    }));
   },
 
   addComment: async (postId: string, content: string) => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('No user logged in')
-    
-    const { error } = await supabase
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('No user logged in');
+
+    const { data, error } = await supabase
       .from('comments')
-      .insert({
-        user_id: user.id,
-        post_id: postId,
-        content,
-      })
-    
-    if (error) throw error
-    
-    // Increment comments count
-    await supabase.rpc('increment_comments', { post_id: postId })
-    
-    await get().fetchComments(postId)
-    await get().fetchFeed()
+      .insert({ user_id: user.id, post_id: postId, content })
+      .select('*, profiles(*)')
+      .single();
+
+    if (error) throw error;
+    set(state => ({
+      comments: {
+        ...state.comments,
+        [postId]: [...(state.comments[postId] || []), data as any],
+      },
+      posts: state.posts.map(p =>
+        p.id === postId ? { ...p, comments_count: p.comments_count + 1 } : p
+      ),
+    }));
   },
-}))
+}));

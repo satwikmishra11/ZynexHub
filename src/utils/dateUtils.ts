@@ -1,19 +1,14 @@
-export const formatDistanceToNow = (dateString: string): string => {
-  const now = new Date();
-  const date = new Date(dateString);
-  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-
-  if (diffInMinutes < 1) {
-    return 'now';
-  } else if (diffInMinutes < 60) {
-    return `${diffInMinutes}m`;
-  } else if (diffInMinutes < 1440) { // 24 hours
-    const hours = Math.floor(diffInMinutes / 60);
-    return `${hours}h`;
-  } else if (diffInMinutes < 10080) { // 7 days
-    const days = Math.floor(diffInMinutes / 1440);
-    return `${days}d`;
-  } else {
-    return date.toLocaleDateString();
-  }
-};
+export const formatDistanceToNow = (date: Date): string => {
+  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+  let interval = seconds / 31536000;
+  if (interval > 1) return Math.floor(interval) + "y";
+  interval = seconds / 2592000;
+  if (interval > 1) return Math.floor(interval) + "mo";
+  interval = seconds / 86400;
+  if (interval > 1) return Math.floor(interval) + "d";
+  interval = seconds / 3600;
+  if (interval > 1) return Math.floor(interval) + "h";
+  interval = seconds / 60;
+  if (interval > 1) return Math.floor(interval) + "m";
+  return Math.floor(seconds) + "s";
+}

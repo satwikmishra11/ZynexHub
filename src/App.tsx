@@ -1,45 +1,60 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './components/AuthProvider';
-import { AuthPage } from './components/auth/AuthPage';
-import { AuthCallback } from './components/auth/AuthCallback';
-import { MainApp } from './components/MainApp';
-import { LoadingSpinner } from './components/LoadingSpinner';
-import { useAuth } from './hooks/useAuth';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from './store/authStore';
+import { supabase } from './lib/supabase';
+import AuthForm from './components/AuthForm';
+import Layout from './components/Layout';
+import Feed from './pages/Feed';
+import Profile from './pages/Profile';
+import Messages from './pages/Messages';
+import Settings from './pages/Settings';
+import { Toaster } from 'sonner';
 
-const AppContent: React.FC = () => {
-  const { authState } = useAuth();
+const App: React.FC = () => {
+  const { session, loading, setSession, setLoading, fetchProfile } = useAuthStore();
 
-  if (authState.isLoading) {
+  useEffect(() => {
+    // This single listener handles the initial state check AND any subsequent
+    // auth changes (login, logout, token refresh).
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session);
+      if (session) {
+        await fetchProfile(session.user);
+      }
+      // Stop the main loading spinner once the initial auth state is known.
+      setLoading(false);
+    });
+
+    // Clean up the listener when the component unmounts.
+    return () => {
+      subscription?.unsubscribe();
+    };
+    
+  }, [setSession, setLoading, fetchProfile]);
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-light-gray flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mb-4 mx-auto">
-            <span className="text-2xl font-bold text-white">Z</span>
-          </div>
-          <LoadingSpinner size="lg" />
-          <p className="text-gray-600 mt-4">Loading ZynexHub...</p>
-        </div>
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <Routes>
-      <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="/*" element={authState.isAuthenticated ? <MainApp /> : <AuthPage />} />
-    </Routes>
-  );
-};
-
-function App() {
-  return (
     <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <Toaster richColors />
+      <Routes>
+        <Route path="/auth" element={!session ? <AuthForm /> : <Navigate to="/" />} />
+        
+        <Route path="/" element={session ? <Layout><Feed /></Layout> : <Navigate to="/auth" />} />
+        <Route path="/profile" element={session ? <Layout><Profile /></Layout> : <Navigate to="/auth" />} />
+        <Route path="/messages" element={session ? <Layout><Messages /></Layout> : <Navigate to="/auth" />} />
+        <Route path="/settings" element={session ? <Layout><Settings /></Layout> : <Navigate to="/auth" />} />
+        
+        <Route path="*" element={<Navigate to={session ? "/" : "/auth"} />} />
+      </Routes>
     </Router>
   );
-}
+};
 
 export default App;
