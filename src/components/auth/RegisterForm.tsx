@@ -36,13 +36,13 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) =
       return;
     }
 
-    setIsLoading(true);
-
     try {
+      setIsLoading(true);
       await register(formData);
-      // If we reach here without error, registration was successful
+      console.log('Registration completed successfully');
       // The auth state change will handle redirection
     } catch (error: any) {
+      console.error('Registration form error:', error);
       if (error.message.includes('check your email')) {
         setSuccess(error.message);
       } else {

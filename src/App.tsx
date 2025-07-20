@@ -10,6 +10,13 @@ import { useAuth } from './hooks/useAuth';
 const AppContent: React.FC = () => {
   const { authState } = useAuth();
 
+  console.log('App render - Auth State:', {
+    isLoading: authState.isLoading,
+    isAuthenticated: authState.isAuthenticated,
+    hasUser: !!authState.user,
+    username: authState.user?.username
+  });
+
   if (authState.isLoading) {
     return (
       <div className="min-h-screen bg-light-gray flex items-center justify-center">
@@ -24,13 +31,13 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // Debug logging
-  console.log('Auth State:', authState);
-
   return (
     <Routes>
       <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="/*" element={authState.isAuthenticated ? <MainApp /> : <AuthPage />} />
+      <Route 
+        path="/*" 
+        element={authState.isAuthenticated ? <MainApp /> : <AuthPage />} 
+      />
     </Routes>
   );
 };

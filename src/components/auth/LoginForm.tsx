@@ -18,18 +18,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
-    setShowResendConfirmation(false);
 
     try {
+      setIsLoading(true);
       await login(email, password);
-      // Login successful - the auth state change will handle redirection
+      console.log('Login completed successfully');
+      // The auth state change will handle redirection
     } catch (error: any) {
+      console.error('Login form error:', error);
       setError(error.message);
-      if (error.message.includes('Email not confirmed')) {
-        setShowResendConfirmation(true);
-      }
     } finally {
       setIsLoading(false);
     }
