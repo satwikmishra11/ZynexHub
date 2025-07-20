@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, CheckCircle } from 'lucide-react';
 import { formatDistanceToNow } from '../../utils/dateUtils';
-import { CommentModal } from '../comments/CommentModal';
+import { EnhancedCommentModal } from '../comments/EnhancedCommentModal';
 import { PostWithProfile } from '../../hooks/usePosts';
 
 interface PostCardProps {
@@ -155,7 +155,7 @@ export const PostCard: React.FC<PostCardProps> = ({
       </div>
 
       {/* Comment Modal */}
-      <CommentModal
+      <EnhancedCommentModal
         post={post}
         isOpen={showComments}
         onClose={() => setShowComments(false)}

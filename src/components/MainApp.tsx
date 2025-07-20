@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Navigation } from './layout/Navigation';
+import { EnhancedNavigation } from './layout/EnhancedNavigation';
 import { FeedPage } from './feed/FeedPage';
 import { ProfilePage } from './profile/ProfilePage';
 import { ChatPage } from './chat/ChatPage';
+import { ModerationDashboard } from './moderation/ModerationDashboard';
 
 export const MainApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState('feed');
@@ -15,6 +16,8 @@ export const MainApp: React.FC = () => {
         return <ProfilePage />;
       case 'messages':
         return <ChatPage />;
+      case 'moderation':
+        return <ModerationDashboard />;
       case 'explore':
         return (
           <div className="flex items-center justify-center py-20">
@@ -40,7 +43,7 @@ export const MainApp: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-light-gray">
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <EnhancedNavigation activeTab={activeTab} onTabChange={setActiveTab} />
       
       <main className="md:ml-64 p-4 md:p-8 pb-20 md:pb-8">
         {renderContent()}

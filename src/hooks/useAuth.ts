@@ -5,6 +5,8 @@ import type { Profile } from '../lib/supabase';
 
 interface AuthUser extends Profile {
   email: string;
+  role: 'user' | 'moderator' | 'admin';
+  status: 'active' | 'suspended' | 'banned';
 }
 
 interface AuthState {
@@ -212,6 +214,16 @@ export const useAuthState = () => {
     console.log('Registration successful');
   };
 
+  const resendConfirmation = async (email: string) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
   const logout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -232,6 +244,7 @@ export const useAuthState = () => {
     authState,
     login,
     register,
+    resendConfirmation,
     logout,
     updateUser,
   };
