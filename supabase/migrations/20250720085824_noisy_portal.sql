@@ -28,21 +28,26 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'role') THEN
     ALTER TABLE profiles ADD COLUMN role text DEFAULT 'user' CHECK (role IN ('user', 'moderator', 'admin'));
   END IF;
-  
+
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'status') THEN
     ALTER TABLE profiles ADD COLUMN status text DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'banned'));
   END IF;
-  
+
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'display_name') THEN
     ALTER TABLE profiles ADD COLUMN display_name text;
   END IF;
-  
+
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'email_verified') THEN
     ALTER TABLE profiles ADD COLUMN email_verified boolean DEFAULT false;
   END IF;
-  
+
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'last_seen') THEN
     ALTER TABLE profiles ADD COLUMN last_seen timestamptz DEFAULT now();
+  END IF;
+
+  -- Add the missing 'bio' column
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'bio') THEN
+    ALTER TABLE profiles ADD COLUMN bio text;
   END IF;
 END $$;
 
@@ -52,19 +57,19 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'comments' AND column_name = 'parent_id') THEN
     ALTER TABLE comments ADD COLUMN parent_id uuid REFERENCES comments(id) ON DELETE CASCADE;
   END IF;
-  
+
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'comments' AND column_name = 'votes_count') THEN
     ALTER TABLE comments ADD COLUMN votes_count integer DEFAULT 0;
   END IF;
-  
+
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'comments' AND column_name = 'is_edited') THEN
     ALTER TABLE comments ADD COLUMN is_edited boolean DEFAULT false;
   END IF;
-  
+
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'comments' AND column_name = 'edit_count') THEN
     ALTER TABLE comments ADD COLUMN edit_count integer DEFAULT 0;
   END IF;
-  
+
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'comments' AND column_name = 'is_deleted') THEN
     ALTER TABLE comments ADD COLUMN is_deleted boolean DEFAULT false;
   END IF;
@@ -153,7 +158,7 @@ CREATE POLICY "Admins can manage all profiles"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM profiles 
+      SELECT 1 FROM profiles
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -197,7 +202,7 @@ CREATE POLICY "Moderators can manage comments"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM profiles 
+      SELECT 1 FROM profiles
       WHERE id = auth.uid() AND role IN ('moderator', 'admin')
     )
   );
@@ -230,7 +235,7 @@ CREATE POLICY "Moderators can view all reports"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM profiles 
+      SELECT 1 FROM profiles
       WHERE id = auth.uid() AND role IN ('moderator', 'admin')
     )
   );
@@ -240,7 +245,7 @@ CREATE POLICY "Moderators can update reports"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM profiles 
+      SELECT 1 FROM profiles
       WHERE id = auth.uid() AND role IN ('moderator', 'admin')
     )
   );
@@ -279,18 +284,18 @@ CREATE OR REPLACE FUNCTION update_comment_votes_count()
 RETURNS TRIGGER AS $$
 BEGIN
   IF TG_OP = 'INSERT' THEN
-    UPDATE comments 
+    UPDATE comments
     SET votes_count = votes_count + CASE WHEN NEW.vote_type = 'upvote' THEN 1 ELSE -1 END
     WHERE id = NEW.comment_id;
     RETURN NEW;
   ELSIF TG_OP = 'DELETE' THEN
-    UPDATE comments 
+    UPDATE comments
     SET votes_count = votes_count - CASE WHEN OLD.vote_type = 'upvote' THEN 1 ELSE -1 END
     WHERE id = OLD.comment_id;
     RETURN OLD;
   ELSIF TG_OP = 'UPDATE' THEN
-    UPDATE comments 
-    SET votes_count = votes_count + 
+    UPDATE comments
+    SET votes_count = votes_count +
       CASE WHEN NEW.vote_type = 'upvote' THEN 1 ELSE -1 END -
       CASE WHEN OLD.vote_type = 'upvote' THEN 1 ELSE -1 END
     WHERE id = NEW.comment_id;
@@ -309,7 +314,7 @@ DECLARE
 BEGIN
   -- Notification for post author (if not commenting on own post)
   SELECT user_id INTO post_author_id FROM posts WHERE id = NEW.post_id;
-  
+
   IF post_author_id != NEW.user_id THEN
     INSERT INTO notifications (user_id, type, title, message, data)
     VALUES (
@@ -320,11 +325,11 @@ BEGIN
       jsonb_build_object('comment_id', NEW.id, 'post_id', NEW.post_id)
     );
   END IF;
-  
+
   -- Notification for parent comment author (if replying)
   IF NEW.parent_id IS NOT NULL THEN
     SELECT user_id INTO parent_author_id FROM comments WHERE id = NEW.parent_id;
-    
+
     IF parent_author_id != NEW.user_id THEN
       INSERT INTO notifications (user_id, type, title, message, data)
       VALUES (
@@ -336,7 +341,7 @@ BEGIN
       );
     END IF;
   END IF;
-  
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
