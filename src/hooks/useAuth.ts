@@ -18,7 +18,13 @@ interface AuthState {
 const AuthContext = createContext<{
   authState: AuthState;
   login: (email: string, password: string) => Promise<void>;
-  register: (userData: any) => Promise<void>;
+  register: (userData: {
+    email: string;
+    password: string;
+    username: string;
+    fullName: string;
+  }) => Promise<void>;
+  resendConfirmation: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (userData: Partial<AuthUser>) => void;
 } | null>(null);
