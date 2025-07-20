@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './components/AuthProvider';
 import { AuthPage } from './components/auth/AuthPage';
 import { AuthCallback } from './components/auth/AuthCallback';
@@ -34,9 +34,25 @@ const AppContent: React.FC = () => {
   return (
     <Routes>
       <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route 
-        path="/*" 
-        element={authState.isAuthenticated ? <MainApp /> : <AuthPage />} 
+      <Route
+        path="/*"
+        element={
+          authState.isAuthenticated ? (
+            <MainApp />
+          ) : (
+            <Navigate to="/auth" replace />
+          )
+        }
+      />
+      <Route
+        path="/auth"
+        element={
+          !authState.isAuthenticated ? (
+            <AuthPage />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
       />
     </Routes>
   );
