@@ -1,71 +1,36 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './components/AuthProvider';
-import { AuthPage } from './components/auth/AuthPage';
-import { AuthCallback } from './components/auth/AuthCallback';
-import { MainApp } from './components/MainApp';
-import { LoadingSpinner } from './components/LoadingSpinner';
-import { useAuth } from './hooks/useAuth';
+import { Routes, Route } from 'react-router-dom';
+import SigninForm from './_auth/Form/SigninForm';
+import SignupForm from './_auth/Form/SignupForm';
+import { AllUsers, CreatePost, EditPost, Explore, Home, PostDetails, Profile, Saved, UpdateProfile } from './_root/pages';
+import './globals.css';
+import AuthLayout from './_auth/AuthLayout';
+import RootLayout from './_root/RootLayout';
 
-const AppContent: React.FC = () => {
-  const { authState } = useAuth();
-
-  console.log('App render - Auth State:', {
-    isLoading: authState.isLoading,
-    isAuthenticated: authState.isAuthenticated,
-    hasUser: !!authState.user,
-    username: authState.user?.username
-  });
-
-  if (authState.isLoading) {
-    return (
-      <div className="min-h-screen bg-light-gray flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mb-4 mx-auto">
-            <span className="text-2xl font-bold text-white">Z</span>
-          </div>
-          <LoadingSpinner size="lg" />
-          <p className="text-gray-600 mt-4">Loading ZynexHub...</p>
-        </div>
-      </div>
-    );
-  }
-
+const App = () => {
   return (
-    <Routes>
-      <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route
-        path="/*"
-        element={
-          authState.isAuthenticated ? (
-            <MainApp />
-          ) : (
-            <Navigate to="/auth" replace />
-          )
-        }
-      />
-      <Route
-        path="/auth"
-        element={
-          !authState.isAuthenticated ? (
-            <AuthPage />
-          ) : (
-            <Navigate to="/" replace />
-          )
-        }
-      />
+    <main className='flex h-screen'>
+      <Routes>
+        {/* Public routes */}
+        <Route element={<AuthLayout />}>
+          <Route path='/sign-in' element={<SigninForm />} />
+          <Route path='/sign-up' element={<SignupForm />} />
+        </Route>
+
+        {/* Private routes */}
+        <Route element={<RootLayout />}>
+          <Route index element={<Home />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/saved" element={<Saved />} />
+          <Route path="/all-users" element={<AllUsers />} />
+          <Route path="/create-post" element={<CreatePost />} />
+          <Route path="/update-post/:id" element={<EditPost />} />
+          <Route path="/posts/:id" element={<PostDetails />} />
+          <Route path="/profile/:id/*" element={<Profile />} />
+          <Route path="/update-profile/:id" element={<UpdateProfile />} />
+        </Route>
     </Routes>
-  );
-};
-
-function App() {
-  return (
-    <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </Router>
-  );
+    </main>
+  )
 }
 
-export default App;
+export default App
