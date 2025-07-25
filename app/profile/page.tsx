@@ -164,7 +164,18 @@ export default function ProfilePage() {
             
             <div className="space-y-6">
               {activeTab === 'posts' && userPosts.map((post) => (
-                <Post key={post.id} post={post} />
+                <Post
+                  key={post.id}
+                  post={{
+                    ...post,
+                    userId: post.user.id,
+                    username: post.user.username,
+                    fullName: post.user.fullName,
+                    avatar: post.user.avatar,
+                    isVerified: post.user.isVerified,
+                  }}
+                />
+
               ))}
               
               {activeTab === 'media' && (
