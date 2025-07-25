@@ -174,7 +174,12 @@ export default function ProfilePage() {
                     avatar: post.user.avatar,
                     isVerified: post.user.isVerified,
                   }}
+                  onLike={() => {}}
+                  onComment={() => {}}
+                  onShare={() => {}}
+                  onBookmark={() => {}}
                 />
+
 
               ))}
               
