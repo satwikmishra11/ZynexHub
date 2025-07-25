@@ -8,6 +8,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { ThemeProvider } from '../../components/ThemeProvider';
 
 function RegisterPageContent() {
   const { register, isLoading } = useAuth();
@@ -50,18 +51,18 @@ function RegisterPageContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 px-4 transition-colors duration-300">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md"
+        className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 w-full max-w-md transition-colors duration-300"
       >
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <i className="ri-community-line text-white text-2xl"></i>
           </div>
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Join ZynexHub</h1>
-          <p className="text-slate-600">Create your account and start connecting</p>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Join ZynexHub</h1>
+          <p className="text-slate-600 dark:text-slate-400">Create your account and start connecting</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -116,7 +117,7 @@ function RegisterPageContent() {
           />
 
           {error && (
-            <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg">
+            <div className="text-red-600 text-sm text-center bg-red-50 dark:bg-red-900/30 p-3 rounded-lg">
               {error}
             </div>
           )}
@@ -132,9 +133,9 @@ function RegisterPageContent() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-slate-600">
+          <p className="text-slate-600 dark:text-slate-400">
             Already have an account?{' '}
-            <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link href="/login" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
               Sign in
             </Link>
           </p>
@@ -146,8 +147,10 @@ function RegisterPageContent() {
 
 export default function RegisterPage() {
   return (
-    <AuthProvider>
-      <RegisterPageContent />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <RegisterPageContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -5,13 +6,12 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../components/AuthProvider';
 import { Header } from '../../components/Header';
 import { Sidebar } from '../../components/Sidebar';
-import { Post, PostData } from '../../components/Post';
+import { Post } from '../../components/Post';
 
 export default function BookmarksPage() {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // The original data structure can be kept as is
   const bookmarkedPosts = [
     {
       id: '1',
@@ -91,13 +91,6 @@ export default function BookmarksPage() {
     post.user.fullName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Add dummy handlers to satisfy the Post component's props
-  const handleLike = (postId: string) => console.log(`Liked post ${postId}`);
-  const handleComment = (postId: string) => console.log(`Commented on post ${postId}`);
-  const handleShare = (postId: string) => console.log(`Shared post ${postId}`);
-  const handleBookmark = (postId: string) => console.log(`Bookmarked post ${postId}`);
-
-
   if (!user) return null;
 
   return (
@@ -137,34 +130,16 @@ export default function BookmarksPage() {
             
             <div className="space-y-6">
               {filteredPosts.length > 0 ? (
-                filteredPosts.map((post, index) => {
-                  // Transform the data here before passing it to the component
-                  const postData: PostData = {
-                    ...post,
-                    userId: post.user.id,
-                    username: post.user.username,
-                    fullName: post.user.fullName,
-                    avatar: post.user.avatar,
-                    isVerified: post.user.isVerified,
-                  };
-
-                  return (
-                    <motion.div
-                      key={post.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <Post
-                        post={postData}
-                        onLike={handleLike}
-                        onComment={handleComment}
-                        onShare={handleShare}
-                        onBookmark={handleBookmark}
-                      />
-                    </motion.div>
-                  );
-                })
+                filteredPosts.map((post, index) => (
+                  <motion.div
+                    key={post.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Post post={post} />
+                  </motion.div>
+                ))
               ) : (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}

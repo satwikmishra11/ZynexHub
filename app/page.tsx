@@ -10,6 +10,7 @@ import { StoriesSection } from '../components/Story';
 import { CreatePost } from '../components/CreatePost';
 import { Post, PostData } from '../components/Post';
 import { AuthProvider } from '../components/AuthProvider';
+import { ThemeProvider } from '../components/ThemeProvider';
 import { useRouter } from 'next/navigation';
 
 function HomePage() {
@@ -169,12 +170,20 @@ function HomePage() {
     ));
   };
 
+  const handleGoLive = () => {
+    alert('Going live feature coming soon!');
+  };
+
+  const handleCreateEvent = () => {
+    alert('Create event feature coming soon!');
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center transition-colors duration-300">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading...</p>
+          <p className="text-slate-600 dark:text-slate-400">Loading...</p>
         </div>
       </div>
     );
@@ -185,7 +194,7 @@ function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8">
@@ -219,26 +228,32 @@ function HomePage() {
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4"
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 transition-colors duration-300"
             >
-              <h3 className="font-semibold text-slate-800 mb-4">Quick Actions</h3>
+              <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <button className="w-full flex items-center gap-3 p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors">
+                <button
+                  onClick={handleGoLive}
+                  className="w-full flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-xl transition-colors"
+                >
                   <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                     <i className="ri-live-line text-white"></i>
                   </div>
                   <div className="text-left">
-                    <div className="font-medium text-slate-800">Go Live</div>
-                    <div className="text-sm text-slate-500">Start broadcasting</div>
+                    <div className="font-medium text-slate-800 dark:text-slate-200">Go Live</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400">Start broadcasting</div>
                   </div>
                 </button>
-                <button className="w-full flex items-center gap-3 p-3 bg-green-50 hover:bg-green-100 rounded-xl transition-colors">
+                <button
+                  onClick={handleCreateEvent}
+                  className="w-full flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 rounded-xl transition-colors"
+                >
                   <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
                     <i className="ri-group-line text-white"></i>
                   </div>
                   <div className="text-left">
-                    <div className="font-medium text-slate-800">Create Event</div>
-                    <div className="text-sm text-slate-500">Organize meetup</div>
+                    <div className="font-medium text-slate-800 dark:text-slate-200">Create Event</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400">Organize meetup</div>
                   </div>
                 </button>
               </div>
@@ -248,24 +263,24 @@ function HomePage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4"
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 transition-colors duration-300"
             >
-              <h3 className="font-semibold text-slate-800 mb-4">Recent Activity</h3>
+              <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-4">Recent Activity</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-slate-600">John liked your post</span>
-                  <span className="text-slate-400 ml-auto">2m</span>
+                  <span className="text-slate-600 dark:text-slate-400">John liked your post</span>
+                  <span className="text-slate-400 dark:text-slate-500 ml-auto">2m</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-slate-600">Sarah commented on your photo</span>
-                  <span className="text-slate-400 ml-auto">5m</span>
+                  <span className="text-slate-600 dark:text-slate-400">Sarah commented on your photo</span>
+                  <span className="text-slate-400 dark:text-slate-500 ml-auto">5m</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span className="text-slate-600">Mike started following you</span>
-                  <span className="text-slate-400 ml-auto">1h</span>
+                  <span className="text-slate-600 dark:text-slate-400">Mike started following you</span>
+                  <span className="text-slate-400 dark:text-slate-500 ml-auto">1h</span>
                 </div>
               </div>
             </motion.div>
@@ -278,8 +293,10 @@ function HomePage() {
 
 export default function Home() {
   return (
-    <AuthProvider>
-      <HomePage />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <HomePage />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

@@ -3,16 +3,15 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useAuth, AuthProvider } from '../../components/AuthProvider';
+import { useAuth } from '../../components/AuthProvider';
 import { Header } from '../../components/Header';
 import { Sidebar } from '../../components/Sidebar';
 import { Button } from '../../components/ui/Button';
 
-function NotificationsPageContent() {
+export default function NotificationsPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('all');
-
-  const notifications = [
+  const [notifications, setNotifications] = useState([
     {
       id: '1',
       type: 'like',
@@ -143,7 +142,7 @@ function NotificationsPageContent() {
       timestamp: '2d',
       isRead: true
     }
-  ];
+  ]);
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -175,31 +174,33 @@ function NotificationsPageContent() {
   });
 
   const markAllAsRead = () => {
-    console.log('Mark all as read');
+    setNotifications(notifications.map(n => ({ ...n, isRead: true })));
   };
 
   const markAsRead = (notificationId: string) => {
-    console.log('Mark as read:', notificationId);
+    setNotifications(notifications.map(n => 
+      n.id === notificationId ? { ...n, isRead: true } : n
+    ));
   };
 
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       <Header />
-      <div className="max-w-7xl mx-auto px-4 pt-20">
-        <div className="flex gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex gap-8">
           <Sidebar />
           
           <div className="flex-1 max-w-2xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-2xl shadow-sm border border-slate-200"
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors duration-300"
             >
-              <div className="p-6 border-b border-slate-200">
+              <div className="p-6 border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center justify-between mb-6">
-                  <h1 className="text-2xl font-bold text-slate-800">Notifications</h1>
+                  <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-200">Notifications</h1>
                   <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
@@ -220,7 +221,7 @@ function NotificationsPageContent() {
                   </div>
                 </div>
                 
-                <div className="flex border-b border-slate-200">
+                <div className="flex border-b border-slate-200 dark:border-slate-700">
                   {tabs.map((tab) => (
                     <button
                       key={tab.id}
@@ -228,7 +229,7 @@ function NotificationsPageContent() {
                       className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium transition-colors ${
                         activeTab === tab.id
                           ? 'border-blue-600 text-blue-600'
-                          : 'border-transparent text-slate-600 hover:text-slate-800'
+                          : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                       }`}
                     >
                       <span>{tab.label}</span>
@@ -236,7 +237,7 @@ function NotificationsPageContent() {
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           activeTab === tab.id
                             ? 'bg-blue-100 text-blue-600'
-                            : 'bg-slate-100 text-slate-600'
+                            : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
                         }`}>
                           {tab.count}
                         </span>
@@ -246,15 +247,15 @@ function NotificationsPageContent() {
                 </div>
               </div>
               
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-100 dark:divide-slate-700">
                 {filteredNotifications.length > 0 ? (
                   filteredNotifications.map((notification) => (
                     <motion.div
                       key={notification.id}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className={`p-4 hover:bg-slate-50 transition-colors cursor-pointer ${
-                        !notification.isRead ? 'bg-blue-50/50' : ''
+                      className={`p-4 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer ${
+                        !notification.isRead ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''
                       }`}
                       onClick={() => markAsRead(notification.id)}
                     >
@@ -267,7 +268,7 @@ function NotificationsPageContent() {
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center">
                             <i className={`${getNotificationIcon(notification.type)} text-sm`}></i>
                           </div>
                         </div>
@@ -275,14 +276,14 @@ function NotificationsPageContent() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
                             <p className="text-sm">
-                              <span className="font-medium text-slate-800">
+                              <span className="font-medium text-slate-800 dark:text-slate-200">
                                 {notification.user.fullName}
                               </span>
-                              <span className="text-slate-600 ml-1">
+                              <span className="text-slate-600 dark:text-slate-400 ml-1">
                                 {notification.content}
                               </span>
                             </p>
-                            <span className="text-xs text-slate-500 ml-2">
+                            <span className="text-xs text-slate-500 dark:text-slate-400 ml-2">
                               {notification.timestamp}
                             </span>
                           </div>
@@ -291,7 +292,7 @@ function NotificationsPageContent() {
                               <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
                             )}
                             <div className="flex items-center gap-1 ml-auto">
-                              <button className="text-slate-400 hover:text-slate-600 text-sm">
+                              <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-sm">
                                 <i className="ri-more-line"></i>
                               </button>
                             </div>
@@ -303,10 +304,10 @@ function NotificationsPageContent() {
                 ) : (
                   <div className="p-8 text-center">
                     <i className="ri-notification-off-line text-6xl text-slate-400 mb-4"></i>
-                    <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">
                       No notifications
                     </h3>
-                    <p className="text-slate-600">
+                    <p className="text-slate-600 dark:text-slate-400">
                       {activeTab === 'unread' 
                         ? 'You have no unread notifications' 
                         : activeTab === 'mentions'
@@ -321,13 +322,5 @@ function NotificationsPageContent() {
         </div>
       </div>
     </div>
-  );
-}
-
-export default function NotificationsPage() {
-  return (
-    <AuthProvider>
-      <NotificationsPageContent />
-    </AuthProvider>
   );
 }

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -6,7 +7,7 @@ import { useAuth } from '../../components/AuthProvider';
 import { Header } from '../../components/Header';
 import { Sidebar } from '../../components/Sidebar';
 import { Button } from '../../components/ui/Button';
-import { Post, PostData } from '../../components/Post';
+import { Post } from '../../components/Post';
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -63,12 +64,6 @@ export default function ProfilePage() {
     { id: 'likes', label: 'Likes', icon: 'ri-heart-line' },
     { id: 'replies', label: 'Replies', icon: 'ri-reply-line' }
   ];
-
-  // Add dummy handlers to satisfy the Post component's props
-  const handleLike = (postId: string) => console.log(`Liked post ${postId}`);
-  const handleComment = (postId: string) => console.log(`Commented on post ${postId}`);
-  const handleShare = (postId: string) => console.log(`Shared post ${postId}`);
-  const handleBookmark = (postId: string) => console.log(`Bookmarked post ${postId}`);
 
   if (!user) return null;
 
@@ -168,28 +163,9 @@ export default function ProfilePage() {
             </motion.div>
             
             <div className="space-y-6">
-              {activeTab === 'posts' && userPosts.map((post) => {
-                // Transform the data here before passing it to the component
-                const postData: PostData = {
-                  ...post,
-                  userId: post.user.id,
-                  username: post.user.username,
-                  fullName: post.user.fullName,
-                  avatar: post.user.avatar,
-                  isVerified: post.user.isVerified,
-                };
-
-                return (
-                  <Post
-                    key={post.id}
-                    post={postData}
-                    onLike={handleLike}
-                    onComment={handleComment}
-                    onShare={handleShare}
-                    onBookmark={handleBookmark}
-                  />
-                );
-              })}
+              {activeTab === 'posts' && userPosts.map((post) => (
+                <Post key={post.id} post={post} />
+              ))}
               
               {activeTab === 'media' && (
                 <motion.div
