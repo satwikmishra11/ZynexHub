@@ -137,14 +137,20 @@ export default function BookmarksPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <Post post={{
-                      ...post,
-                      userId: post.user.id,
-                      username: post.user.username,
-                      fullName: post.user.fullName,
-                      avatar: post.user.avatar,
-                      isVerified: post.user.isVerified,
-                    }} />
+                   <Post
+                      post={{
+                        ...post,
+                        userId: post.user.id,
+                        username: post.user.username,
+                        fullName: post.user.fullName,
+                        avatar: post.user.avatar,
+                        isVerified: post.user.isVerified,
+                      }}
+                      onLike={() => {}}
+                      onComment={() => {}}
+                      onShare={() => {}}
+                      onBookmark={() => {}}
+                    />
                   </motion.div>
                 ))
               ) : (
