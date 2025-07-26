@@ -1,10 +1,13 @@
-
 'use client';
 
 import React, { forwardRef } from 'react';
 import { motion } from 'framer-motion';
+import type { InputHTMLAttributes } from 'react';
+import type { HTMLMotionProps } from 'framer-motion';
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+type MotionInputProps = InputHTMLAttributes<HTMLInputElement> & HTMLMotionProps<'input'>;
+
+interface InputProps extends MotionInputProps {
   label?: string;
   error?: string;
   icon?: React.ReactNode;
@@ -36,9 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
         </div>
-        {error && (
-          <p className="mt-1 text-sm text-red-600">{error}</p>
-        )}
+        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
       </div>
     );
   }
